@@ -16,6 +16,20 @@
 
             await AuthHandler.handleVerifyEmail()
         }
+        function getParameterByName(name, url) {
+            name = name.replace(/[\[\]]/g, '\\$&');
+            const regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
+                results = regex.exec(url);
+            if (!results) return null;
+            if (!results[2]) return '';
+            return decodeURIComponent(results[2].replace(/\+/g, ' '));
+        }
+
+        // Get the current URL
+        const currentUrl = window.location.href;
+
+        // Extracting oobCode from the current URL
+        const oobCode = getParameterByName('oobCode', currentUrl);
         const AuthHandler = {
             init: props => {
                 AuthHandler.conf = props
@@ -129,9 +143,10 @@
                     AuthHandler.displayErrorMessage('Invalid action code. Please try again.')
                 })
             },
+
             handleVerifyEmail: () => {
                 // AuthHandler.showLoadingSpinner()
-                AuthHandler.conf.applyActionCode(AuthHandler.conf.auth, 'su_znMay0gSYE8GZ8XwIcJr5bENlJGyffiR9d4emGrIAAAGOfoGgVQ').then(() => {
+                AuthHandler.conf.applyActionCode(AuthHandler.conf.auth, oobCode).then(() => {
                     // AuthHandler.hideLoadingSpinner()
                     // AuthHandler.displaySuccessMessage('Email verified! Your account is now active. Time to send some messages!')
                 }).catch((e) => {
